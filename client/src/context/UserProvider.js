@@ -18,9 +18,11 @@ export default function UserProvider(props){
     posts: [],
     errMsg: ""
   }
-
+  
   const [userState, setUserState] = useState(initState)
-
+  
+  console.log("this is userContext's definition of user")
+  console.log(userState.user)
   function signup(credentials){
     axios.post("/auth/signup", credentials)
       .then(res => {
@@ -42,7 +44,6 @@ export default function UserProvider(props){
         const { user, token } = res.data
         localStorage.setItem("token", token)
         localStorage.setItem("user", JSON.stringify(user))
-        // getUserTodos()
         setUserState(prevUserState => ({
           ...prevUserState,
           user,

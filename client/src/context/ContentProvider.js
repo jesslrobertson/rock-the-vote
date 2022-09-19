@@ -1,12 +1,11 @@
 //look into UseReducer to manage the many different kinds of State
 import React, { useReducer, useContext, useState } from 'react'
-import UserContext from './UserProvider'
 import axios from 'axios'
 
 export const ContentContext = React.createContext()
-const userAxios = axios.create()
+const contentAxios = axios.create()
 
-userAxios.interceptors.request.use(config => {
+contentAxios.interceptors.request.use(config => {
   const token = localStorage.getItem("token")
   config.headers.Authorization = `Bearer ${token}`
   return config
@@ -14,7 +13,15 @@ userAxios.interceptors.request.use(config => {
 
 export default function ContentProvider(props){
 
-  const [userPosts, setUserPosts] = useState([])
+  const initState = { 
+    user: JSON.parse(localStorage.getItem("user")) || {}, 
+    token: localStorage.getItem("token") || "", 
+    userPosts: [],
+    allPosts: []
+  }
+
+  const [userContent, setUserContent] = useState(initState)
+
   function reducer(state, action) {
     let newState;
     switch (action.type) {
@@ -37,9 +44,21 @@ export default function ContentProvider(props){
 
 
   function getUserPosts(){
-    userAxios.get("/api/post/user")
+    contentAxios.get("/api/post/user")
       .then(res => {
-        setUserPosts(prevState => ({
+        setUserContent(prevState => ({
+          ...prevState,
+          userPosts: res.data
+        }))
+      })
+      .catch(err => console.log(err.response.data.errMsg))
+  }
+
+
+  function addPost(newPost){
+    contentAxios.post("/api/post", newPost)
+      .then(res => {
+        setUserContent(prevState => ({
           ...prevState,
           posts: res.data
         }))
@@ -47,26 +66,32 @@ export default function ContentProvider(props){
       .catch(err => console.log(err.response.data.errMsg))
   }
 
-  function addPost(newPost){
-    userAxios.post("/api/post", newPost)
-      .then(res => {
-        setUserPosts(prevState => ({
-          ...prevState,
-          posts: [...prevState, res.data]
-        }))
-      })
-      .catch(err => console.log(err.response.data.errMsg))
+  function getAllPosts(){
+    contentAxios.get("/api/post/")
+    .then(res => {
+      setUserContent(prevState => ({
+        ...prevState,
+        allPosts: res.data
+      }))
+      //clean this up so we're not overwriting state
+    })
+    .catch(err => console.log(err.response.data.errMsg))
   }
+
+  //TODO getComments()
+  //TODO postComment()
+  //TODO upvote()
+  //TODO downvote
+
 
 
   return(
     <ContentContext.Provider
       value={{
         getUserPosts,
-        // getUserComments,
-        addPost
-        // addUserComment,
-        // addUserVote
+        ...userContent,
+        getAllPosts,
+        addPost      
       }}>
         { props.children }
       </ContentContext.Provider>

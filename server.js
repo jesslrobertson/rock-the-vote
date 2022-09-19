@@ -7,6 +7,7 @@ const { expressjwt } = require('express-jwt')
 
 app.use(express.json())
 app.use(morgan('dev'))
+app.disable('etag');
 
 mongoose.connect(
   process.env.URI,

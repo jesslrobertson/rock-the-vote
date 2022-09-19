@@ -23,6 +23,7 @@ button {
   color: #fafafa;
   font-weight: 500;
   font-size: 1rem;
+  margin: 1rem;
 }
 
 input {
@@ -107,7 +108,14 @@ form {
   border: none;
   font-family: Arial, Helvetica, sans-serif;
   border-radius: 5px;
-  text-align: ;
-  
+}
+
+.post {
+  background-color:rgb(191, 208, 248);
+  border-radius: 10px;
+}
+
+.post-img {
+  height: 200px;
 }
 

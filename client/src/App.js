@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Nav from './components/Nav'
 import Auth from './components/Auth'
@@ -8,9 +8,13 @@ import ProtectedRoute from './components/ProtectedRoute'
 import "./App.css"
 import PostForm from "./pages/PostForm"
 import { UserContext } from './context/UserProvider'
+import {ContentContext} from './context/ContentProvider'
 
 export default function App(){
   const { token, logout } = useContext(UserContext)
+  const { getAllPosts, getUserPosts} = useContext(ContentContext)
+
+
   return (
     <div className="app">
       {token && <Nav logout={logout}/>}
