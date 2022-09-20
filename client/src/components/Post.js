@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { UserContext } from '../context/UserProvider'
+import { ContentContext } from '../context/ContentProvider'
 import CommentBox from './CommentBox'
 
 
@@ -8,14 +9,14 @@ export default function Post(props){
   const { title, imgUrl, description, user: postUser, _id: postId} = props
   // const userId = localStorage.getItem("user")
   const { user: loggedInUser } = useContext(UserContext)
-  console.log("user as known in post.js")
-  console.log(loggedInUser)
+  const { deletePost } = useContext(ContentContext)
 
 
 
   const userPost = (
     <> 
       <h2>{title}</h2>
+      <h4>{`By ${loggedInUser.username}`}</h4>
       {imgUrl && <img src={imgUrl} alt="user image" className="post-img" />}
       <p>{description}</p>
       <div className='post-stats'>
@@ -24,7 +25,7 @@ export default function Post(props){
       </div>
       <div className="edit-delete-box">
         <button>Edit</button>
-        <button>Delete</button>
+        <button onClick={() => deletePost(postId)}>Delete</button>
       </div>
     </>
   )

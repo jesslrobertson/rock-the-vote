@@ -17,7 +17,8 @@ export default function ContentProvider(props){
     user: JSON.parse(localStorage.getItem("user")) || {}, 
     token: localStorage.getItem("token") || "", 
     userPosts: [],
-    allPosts: []
+    allPosts: [],
+    message: ""
   }
 
   const [userContent, setUserContent] = useState(initState)
@@ -78,6 +79,19 @@ export default function ContentProvider(props){
     .catch(err => console.log(err.response.data.errMsg))
   }
 
+  function deletePost(postId){
+    contentAxios.delete(`/api/post/${postId}`)
+    .then(res => {
+      setUserContent(prevState => ({
+        ...prevState,
+        userPosts: prevState.userPosts.filter(post => post._id != postId),
+        allPosts: prevState.allPosts.filter(post => post._id != postId),
+        message: `${res.data}`
+      }))
+    })
+    .catch(err => console.log(err.response.data.errMsg))
+  }
+
   //TODO getComments()
   //TODO postComment()
   //TODO upvote()
@@ -91,7 +105,8 @@ export default function ContentProvider(props){
         getUserPosts,
         ...userContent,
         getAllPosts,
-        addPost      
+        addPost,
+        deletePost    
       }}>
         { props.children }
       </ContentContext.Provider>
