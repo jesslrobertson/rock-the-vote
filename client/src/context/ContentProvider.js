@@ -22,6 +22,8 @@ export default function ContentProvider(props){
   }
 
   const [userContent, setUserContent] = useState(initState)
+  const [upvotes, setUpvotes] = useState()
+  const [downvotes, setDownvotes] = useState()
 
   function reducer(state, action) {
     let newState;
@@ -94,8 +96,26 @@ export default function ContentProvider(props){
 
   //TODO getComments()
   //TODO postComment()
-  //TODO upvote()
-  //TODO downvote
+
+  function upvotePost(postId){
+    contentAxios.put(`/api/post/upvote/${postId}`)
+    .then(res => {
+      console.log("Upvote called")
+      setUpvotes(res.data.upvotes.length)
+      setDownvotes(res.data.downvotes.length)
+    })
+    .catch(err => console.log(err.response.data.errMsg))
+  }
+
+  function downvotePost(postId){
+    contentAxios.put(`/api/post/downvote/${postId}`)
+    .then(res => {
+      console.log("downvote called")
+      setUpvotes(res.data.upvotes.length)
+      setDownvotes(res.data.downvotes.length)
+    })
+    .catch(err => console.log(err.response.data.errMsg))
+  }
 
 
 
@@ -106,7 +126,11 @@ export default function ContentProvider(props){
         ...userContent,
         getAllPosts,
         addPost,
-        deletePost    
+        deletePost,
+        upvotePost,
+        downvotePost,
+        upvotes,
+        downvotes    
       }}>
         { props.children }
       </ContentContext.Provider>

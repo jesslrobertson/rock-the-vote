@@ -18,7 +18,7 @@ postRouter.post("/", (req, res, next) => {
   console.log(req.body)
   req.body.user = req.auth._id
   const newPost = new Post(req.body)
-  newPost.voters.push(req.auth._id)
+  newPost.upvotes.push(req.auth._id)
   newPost.save((err, savedPost) => {
     if(err){
       res.status(500)
@@ -68,5 +68,37 @@ postRouter.put("/:postId", (req, res, next) => {
     }
   )
 })
+
+postRouter.put("/upvote/:postId", (req, res, next) => {
+  Post.findByIdAndUpdate(
+    { _id: req.params.postId, user: req.auth._id },
+    { $addToSet: { upvotes: req.auth._id }, $pull: { downvotes: req.auth._id }},
+    { new: true },
+    (err, updatedPost) => {
+      if(err){
+        res.status(500)
+        return next(err)
+      }
+      return res.status(201).send(updatedPost)
+    }
+  )
+})
+
+postRouter.put("/downvote/:postId", (req, res, next) => {
+  Post.findByIdAndUpdate(
+    { _id: req.params.postId, user: req.auth._id },
+    { $addToSet: { downvotes: req.auth._id }, $pull: { upvotes: req.auth._id }},
+    { new: true },
+    (err, updatedPost) => {
+      if(err){
+        res.status(500)
+        return next(err)
+      }
+      return res.status(201).send(updatedPost)
+    }
+  )
+})
+
+
 
 module.exports = postRouter
