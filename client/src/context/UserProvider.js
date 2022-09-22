@@ -21,8 +21,6 @@ export default function UserProvider(props){
   
   const [userState, setUserState] = useState(initState)
   
-  console.log("this is userContext's definition of user")
-  console.log(userState.user)
   function signup(credentials){
     axios.post("/auth/signup", credentials)
       .then(res => {

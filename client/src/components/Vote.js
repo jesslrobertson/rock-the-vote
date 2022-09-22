@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { ContentContext } from "../context/ContentProvider"
 
-export default function Vote(){
-
+export default React.memo(function Vote(props){
+  const { upvotePost, downvotePost } = useContext(ContentContext)
+  const { postId, upvotes, downvotes } = props 
   return(
-    <form>
-      <button>Like</button>
-      <button>Dislike</button>
-    </form>
+    <>
+      <button onClick={()=>upvotePost(postId)}>{upvotes.length}--Upvote</button>
+      <button onClick={()=>downvotePost(postId)}>{downvotes.length}--Downvote</button>
+    </>
   )
-}
+})

@@ -23,12 +23,14 @@ const postSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Comment"
   }],
-  votes: {
-    type: Number
-  },
-  voters: {
-    type: Array
-  },
+  upvotes: [{
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  }],
+  downvotes: [{
+    type: Schema.Types.ObjectId,
+    ref: "User"
+  }],
   timestamp: {
     type: Date,
     default: Date.now
