@@ -7,10 +7,10 @@ import Vote from './Vote'
 
 
 export default React.memo(function Post(props){
-  const { title, imgUrl, description, user: postUser, _id: postId} = props
+  const { title, imgUrl, description, user: postUser, _id: postId, upvotes, downvotes} = props
   // const userId = localStorage.getItem("user")
   const { user: loggedInUser } = useContext(UserContext)
-  const { deletePost, upvotes, downvotes } = useContext(ContentContext)
+  const { deletePost } = useContext(ContentContext)
 
 
   const userPost = (
@@ -19,15 +19,10 @@ export default React.memo(function Post(props){
       <h4>{`By ${loggedInUser.username}`}</h4>
       {imgUrl && <img src={imgUrl} alt="user image" className="post-img" />}
       <p>{description}</p>
-      <div className='post-stats'>
-        <p>Upvotes: {upvotes}</p>
-        <p>Downvotes: {downvotes}</p>
-      </div>
       <div className="edit-delete-box">
         <button>Edit</button>
         <button onClick={() => deletePost(postId)}>Delete</button>
       </div>
-      <Vote postId={postId} key={postId} />
     </>
   )
 
@@ -36,11 +31,6 @@ export default React.memo(function Post(props){
       <h2 >{title}</h2>
       {imgUrl && <img src={imgUrl} alt="user image" className="post-img"/>}
       <p>{description}</p>
-      <div className='post-stats'>
-        <p>Upvotes: {upvotes}</p>
-        <p>Downvotes: {downvotes}</p>
-      </div>
-      <Vote postId={postId} key={postId}/>
     </>
   )
 
@@ -51,6 +41,7 @@ export default React.memo(function Post(props){
       userPost
       : otherPost
       }
+      <Vote postId={postId} key={postId} upvotes={upvotes} downvotes={downvotes}/>
     </div>
 
   )
