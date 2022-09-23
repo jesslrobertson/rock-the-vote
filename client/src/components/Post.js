@@ -7,11 +7,10 @@ import Vote from './Vote'
 
 
 export default React.memo(function Post(props){
-  const { title, imgUrl, description, user: postUser, _id: postId, upvotes, downvotes} = props
+  const { title, imgUrl, description, user: postUser, _id: postId, upvotes, downvotes, index} = props
   // const userId = localStorage.getItem("user")
   const { user: loggedInUser } = useContext(UserContext)
   const { deletePost } = useContext(ContentContext)
-
 
   const userPost = (
     <> 
@@ -41,7 +40,7 @@ export default React.memo(function Post(props){
       userPost
       : otherPost
       }
-      <Vote postId={postId} key={postId} upvotes={upvotes} downvotes={downvotes}/>
+      <Vote postId={postId} key={postId} upvotes={upvotes} downvotes={downvotes} index={index}/>
     </div>
 
   )

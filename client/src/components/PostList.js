@@ -10,7 +10,9 @@ export default React.memo(function PostList(props) {
         I'm a list of posts. An array of posts will be mapped over to render
         here.
       </h2>
-      {posts?.map(post => <Post {...post} key={post._id} id={post._id}/>)}
+      {posts?.map((post, index) => (
+        <Post {...post} key={post._id} id={post._id} index={index} />
+      ))}
     </div>
   );
-})
+});
