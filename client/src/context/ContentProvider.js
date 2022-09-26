@@ -1,160 +1,185 @@
 //look into UseReducer to manage the many different kinds of State
-import React, { useReducer, useContext, useState } from 'react'
-import axios from 'axios'
+import React, { useReducer, useContext, useState } from "react";
+import axios from "axios";
 
-export const ContentContext = React.createContext()
-const contentAxios = axios.create()
+export const ContentContext = React.createContext();
+const contentAxios = axios.create();
 
-contentAxios.interceptors.request.use(config => {
-  const token = localStorage.getItem("token")
-  config.headers.Authorization = `Bearer ${token}`
-  return config
-})
+contentAxios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
-export default function ContentProvider(props){
+export default function ContentProvider(props) {
+  const initState = {
+    user: JSON.parse(localStorage.getItem("user")) || {},
+    token: localStorage.getItem("token") || "",
+    posts: [
+      {
+        _id: "",
+        title: "",
+        imgUrl: "",
+        description: "",
+        user: "",
+        comments: [],
+        upvotes: [],
+        downvotes: [],
+        timestamp: "",
+        __v: 0,
+      },
+    ],
+    currentPost:"",
+    message: "",
+  };
+  
+  const [state, dispatch] = useReducer(
+    contentReducer,
+    initState
+  )
 
-  const initState = { 
-    user: JSON.parse(localStorage.getItem("user")) || {}, 
-    token: localStorage.getItem("token") || "", 
-    posts: [{
-      _id: "",
-      title: "",
-      imgUrl: "",
-      description: "",
-      user: "",
-      comments: [],
-      upvotes: [
-      ],
-      downvotes: [
-      ],
-      timestamp: "",
-      __v: 0
-    }],
-    message: ""
+
+  function contentReducer(state, action) {
+    let newState
+    const prevPosts = [...state.posts ]
+    switch (action.type) {
+      case 'getPosts':
+        newState = {
+          ...state,
+          posts: action.value
+        }
+        break
+      case 'appendPosts':
+        newState = {
+          ...state,
+          posts: [...state.posts, action.value]
+        }
+        break
+      case 'removePost':
+        newState = {
+          ...state,
+          posts: action.value
+        }
+        break
+      case 'updatePosts':
+        const updatedPostIndex = prevPosts.findIndex(post => post._id === action.value._id)
+        prevPosts[updatedPostIndex] = action.value
+        newState = {
+          ...state,
+          posts: prevPosts
+        }
+        break
+      // case 'removeComment':
+      //   return {
+      //     ...state,
+      //     currentPost: action.value
+      //   }
+      default:
+        throw new Error();
+    }
+    return newState
   }
 
-  const [userContent, setUserContent] = useState(initState)
-  // function handleVotes(){
-  //   const [state, dispatch] = React.useReducer(
-  //     reducer, 
-  //     reducerState
-  //   )
-  // }
-
-  // function reducer(state, action) {
-  //   let newState;
-  //   switch (action.type) {
-  //     case 'upvote':
-  //       newState = { upvotes: state.upvotes + 1 };
-  //       break;
-  //     case 'downvote':
-  //       newState = { downvotes: state.downvotes - 1 };
-  //       break;
-  //     case 'comment':
-  //     newState = { };
-  //     break;
-  //     case 'removeComment':
-  //     newState = { };
-  //     break;
-  //     default:
-  //       throw new Error();
-  //   }
-  //   return newState;
-  // }
-
-
-  function getUserPosts(){
-    contentAxios.get("/api/post/user")
-      .then(res => {
-        setUserContent(prevState => ({
-          ...prevState,
-          posts: res.data
-        }))
-      })
-      .catch(err => console.log(err.response.data.errMsg))
-  }
-
-
-  function addPost(newPost){
-    contentAxios.post("/api/post", newPost)
-      .then(res => {
-        setUserContent(prevState => ({
-          ...prevState,
-          posts: res.data
-        }))
-      })
-      .catch(err => console.log(err.response.data.errMsg))
-  }
-
-  function getAllPosts(){
-    contentAxios.get("/api/post/")
-    .then(res => {
-      setUserContent(prevState => ({
-        ...prevState,
-        posts: res.data
-      }))
-      //clean this up so we're not overwriting state
-    })
-    .catch(err => console.log(err.response.data.errMsg))
-  }
-
-  function deletePost(postId){
-    contentAxios.delete(`/api/post/${postId}`)
-    .then(res => {
-      setUserContent(prevState => ({
-        ...prevState,
-        posts: prevState.posts.filter(post => post._id != postId),
-        message: `${res.data}`
-      }))
-    })
-    .catch(err => console.log(err.response.data.errMsg))
-  }
-
-  //TODO getComments()
-  //TODO postComment()
-
-  function upvotePost(postId){
-    contentAxios.put(`/api/post/upvote/${postId}`)
-    .then(res => {
-      console.log("Upvote called")
-      setUserContent(prevState => ({
-        ...prevState,
-        posts: prevState.posts.map((post) => {
-          return post._id === res.data._id ? res.data : post
+  
+    
+    function getUserPosts() {
+      contentAxios
+        .get("/api/post/user")
+        .then((res) => {
+          dispatch({type: 'getPosts', value: res.data})
         })
-      }))
-    })
-    .catch(err => console.log(err.response.data.errMsg))
+        .catch((err) => console.log(err.response.data.errMsg));
+    }
+  
+  function addPost(newPost) {
+    contentAxios
+      .post("/api/post", newPost)
+      .then(res => {
+        dispatch({type: 'appendPosts', value: res.data})
+      })
+      .catch((err) => console.log(err.response.data.errMsg));
   }
 
-  function downvotePost(postId){
-    contentAxios.put(`/api/post/downvote/${postId}`)
-    .then(res => {
-      console.log("downvote called")
-      setUserContent(prevState => ({
-        ...prevState,
-        posts: prevState.posts.map((post) => {
-          return post._id === res.data._id ? res.data : post
+  function getAllPosts() {
+    contentAxios
+      .get("/api/post/")
+      .then((res) => {
+        dispatch({type: 'getPosts', value: res.data})
+        //clean this up so we're not overwriting state
+      })
+      .catch((err) => console.log(err.response.data.errMsg));
+  }
+
+  function deletePost(postId) {
+    contentAxios
+      .delete(`/api/post/${postId}`)
+      .then((res) => {
+        const freshPosts = state.posts.filter(post => post._id != postId)
+        console.log(freshPosts)
+        dispatch({type: 'removePost', value: freshPosts})
+      })
+      .catch((err) => console.log(err.response.data.errMsg));
+  }
+
+  // //TODO getComments()
+  // //TODO postComment()
+
+  function upvotePost(postId, voteStatus) {
+    console.log(`upvote called. Vote status is ${voteStatus}`)
+      contentAxios
+        .put(`/api/post/upvote/${postId}`)
+        .then((res) => {
+          dispatch({type: 'updatePosts', value: res.data})
         })
-      }))
-    })
-    .catch(err => console.log(err.response.data.errMsg))
-  }
+        .catch((err) => console.log(err.response.data.errMsg));
+    }
+  
 
+  function downvotePost(postId, voteStatus) {
+    console.log(`downvote called. Vote status is ${voteStatus}`)
+      contentAxios
+        .put(`/api/post/downvote/${postId}`)
+        .then((res) => {
+          dispatch({type: 'updatePosts', value: res.data})
+        })
+        .catch((err) => console.log(err.response.data.errMsg));
+    }
+  
+    function removeUpvote(postId, voteStatus) {
+      contentAxios
+      .put(`/api/post/removeUpvote/${postId}`)
+      .then((res) => {
+        dispatch({type: 'updatePosts', value: res.data})
+      })
+      .catch((err) => console.log(err.reponse.data.errMsg))
+    }
+    
+    function removeDownvote(postId, voteStatus) {
+      contentAxios
+        .put(`/api/post/removeDownvote/${postId}`)
+        .then((res) => {
+          dispatch({type: 'updatePosts', value: res.data})
+        })
+        .catch((err) => console.log(err.reponse.data.errMsg))
+    }
 
-
-  return(
+  return (
     <ContentContext.Provider
       value={{
+        state,
+        dispatch,
         getUserPosts,
-        ...userContent,
+        // ...userContent,
         getAllPosts,
         addPost,
         deletePost,
         upvotePost,
-        downvotePost 
-      }}>
-        { props.children }
-      </ContentContext.Provider>
-  )
+        downvotePost,
+        removeUpvote,
+        removeDownvote
+      }}
+    >
+      {props.children}
+    </ContentContext.Provider>
+  );
 }

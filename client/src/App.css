@@ -119,3 +119,25 @@ form {
   height: 200px;
 }
 
+.vote-box {
+  display: flex;
+  flex-direction: row;
+}
+
+.vote-count {
+  font-weight: bold;
+  padding: .5rem 0rem;
+}
+
+.yea {
+  background-color: green;
+}
+
+.neutral {
+  background-color: gray;
+}
+
+.nay {
+  background-color: red;
+}
+

@@ -1,6 +1,7 @@
 const express = require("express")
 const postRouter = express.Router()
 const Post = require('../models/post.js')
+const mongoose = require('mongoose')
 
 // Get All posts
 postRouter.get("/", (req, res, next) => {
@@ -48,7 +49,7 @@ postRouter.delete("/:postId", (req, res, next) => {
         res.status(500)
         return next(err)
       }
-      return res.status(200).send(`Successfully deleted post: ${deletedPost.title}`)
+      return res.status(200).send()
     }
   )
 })
@@ -79,6 +80,7 @@ postRouter.put("/upvote/:postId", (req, res, next) => {
         res.status(500)
         return next(err)
       }
+      console.log(`${updatedPost}`)
       return res.status(201).send(updatedPost)
     }
   )
@@ -94,6 +96,39 @@ postRouter.put("/downvote/:postId", (req, res, next) => {
         res.status(500)
         return next(err)
       }
+      console.log(updatedPost)
+      return res.status(201).send(updatedPost)
+    }
+  )
+})
+
+postRouter.put("/removeUpvote/:postId", (req, res, next) => {
+  Post.findByIdAndUpdate(
+    {_id: req.params.postId},
+    { $pull: {upvotes: mongoose.Types.ObjectId(req.auth._id)}},
+    {new: true},
+    (err, updatedPost) => {
+      if(err){
+        res.status(500)
+        return next(err)
+      }
+      console.log(`${updatedPost}`)
+      return res.status(201).send(updatedPost)
+    }
+  )
+})
+
+postRouter.put("/removeDownvote/:postId", (req, res, next) => {
+  Post.findByIdAndUpdate(
+    {_id: req.params.postId},
+    { $pull:{ downvotes: mongoose.Types.ObjectId(req.auth._id)}},
+    {new: true},
+    (err, updatedPost) => {
+      if(err){
+        res.status(500)
+        return next(err)
+      }
+      console.log(`${updatedPost}`)
       return res.status(201).send(updatedPost)
     }
   )
