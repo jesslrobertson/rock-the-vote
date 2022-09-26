@@ -1,7 +1,6 @@
 //look into UseReducer to manage the many different kinds of State
 import React, { useReducer, useContext, useState } from "react";
 import axios from "axios";
-import { resolvePath } from "react-router-dom";
 
 export const ContentContext = React.createContext();
 const contentAxios = axios.create();
@@ -33,7 +32,11 @@ export default function ContentProvider(props) {
     currentPost:"",
     message: "",
   };
-
+  
+  const [state, dispatch] = useReducer(
+    contentReducer,
+    initState
+  )
 
   function contentReducer(state, action) {
     switch (action.type) {
@@ -45,53 +48,32 @@ export default function ContentProvider(props) {
       case 'appendPosts':
         return {
           ...state,
-          posts: state.posts.concat(action.value)
+          posts: [...state.posts, action.value]
         }
       case 'removePost':
       return {
         ...state,
-        posts: state.posts.filter(post => post._id !== action.value)
+        posts: [...state.posts.filter(post => post._id !== action.value)]
       }
-      case 'updateCurrentPost':
+      case 'updatePosts':
+        const prevPosts = [...state.posts ]
+        const updatedPostIndex = prevPosts.indexOf(post => post._id === action.value._id)
+        prevPosts[updatedPostIndex] = action.value
         return {
           ...state,
-          currentPost: action.value
-        }
-      case 'adjustVotes':
-        return {
-          ...state,
-          currentPost: action.value
-        }
-      case 'addDownvote':
-        return {
-          ...state,
-          currentPost: action.value
-        }
-      case 'removeVote':
-        return {
-          ...state,
-          currentPost: action.value
-        }
-      case 'comment':
-        return {
-          ...state,
-          currentPost: action.value
-        }
-      case 'removeComment':
-        return {
-          ...state,
-          currentPost: action.value
-        }
+          posts: prevPosts
+      }
+      // case 'removeComment':
+      //   return {
+      //     ...state,
+      //     currentPost: action.value
+      //   }
       default:
         throw new Error();
     }
   }
 
   
-    const [state, dispatch] = useReducer(
-      contentReducer,
-      initState
-    )
     
     function getUserPosts() {
       contentAxios
@@ -134,56 +116,52 @@ export default function ContentProvider(props) {
   // //TODO postComment()
 
   function upvotePost(postId, index) {
-    dispatch({type: 'updateCurrentPost', value: state.posts.find(post => post._id === postId)})
-    if (
-      state.posts[index].downvotes?.includes(state.user._id) ||
-      state.posts[index].upvotes?.includes(state.user._id)
-    ) {
-      console.log('calling to remove vote')
-      contentAxios
-        .put(`/api/post/removeVote/${postId}`)
-        .then((res) => {
-          dispatch({type: 'adjustVotes', value: res.data })
-          console.log(res.data.downvotes)
-        })
-        .catch((err) => console.log(err.response.data.errMsg));
-    } else {
-      console.log('calling to upvote')
+    // const thisPost = (state.posts.find(post => post._id === postId))
+    // if (
+    //   thisPost.downvotes?.includes(state.user._id) ||
+    //   thisPost.upvotes?.includes(state.user._id)
+    // ) {
+    //   console.log('calling to remove vote')
+    //   contentAxios
+    //     .put(`/api/post/removeVote/${postId}`)
+    //     .then((res) => {
+    //       console.log(res)
+    //       dispatch({type: 'updatePosts', value: res.data })
+    //       console.log(state.posts)
+    //     })
+    //     .catch((err) => console.log(err.response.data.errMsg));
+    // } else {
       contentAxios
         .put(`/api/post/upvote/${postId}`)
         .then((res) => {
-          console.log(res)
-          // dispatch({type: 'adjustVotes', value: res.data})
-          // console.log(res.data.downvotes)
+          dispatch({type: 'updatePosts', value: res.data})
         })
         .catch((err) => console.log(err.response.data.errMsg));
     }
-  }
 
   function downvotePost(postId, index) {
-    dispatch({type: 'updateCurrentPost', value: state.posts.find(post => post._id === postId)})
-    if (
-      state.posts[index].downvotes?.includes(state.user._id) ||
-      state.posts[index].upvotes?.includes(state.user._id)
-    ) {
+    // const thisPost = (state.posts.find(post => post._id === postId))
+    // if (
+    //   thisPost.downvotes?.includes(state.user._id) ||
+    //   thisPost.upvotes?.includes(state.user._id)
+    // ) {
+    //   console.log('calling to remove vote')
+    //   contentAxios
+    //     .put(`/api/post/removeVote/${postId}`)
+    //     .then((res) => {
+    //       console.log(res)
+    //       dispatch({type: 'updatePosts', value: res.data })
+    //     })
+    //     .catch((err) => console.log(err.response.data.errMsg));
+    // } else {
       contentAxios
-        .put(`/api/post/removeVote/${postId}`)
+        .put(`/api/post/downvote/${postId}`)
         .then((res) => {
-          dispatch({type: 'adjustVotes', value: res.data })
-          console.log(res.data.downvotes)
-        })
-        .catch((err) => console.log(err.response.data.errMsg));
-    } else {
-      contentAxios
-        .put(`/api/post/upvote/${postId}`)
-        .then((res) => {
-          console.log(resolvePath)
-          // dispatch({type: 'adjustVotes', value: res.data})
-          // console.log(res.data.downvotes)
+          dispatch({type: 'updatePosts', value: res.data})
         })
         .catch((err) => console.log(err.response.data.errMsg));
     }
-  }
+
 
   return (
     <ContentContext.Provider

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import Post from "./Post";
+import { ContentContext } from "../context/ContentProvider";
 
-export default React.memo(function PostList(props) {
-  const { posts } = props;
+export default function PostList(props) {
+  const { state } = useContext(ContentContext);
 
   return (
     <div>
@@ -10,9 +11,9 @@ export default React.memo(function PostList(props) {
         I'm a list of posts. An array of posts will be mapped over to render
         here.
       </h2>
-      {posts?.map((post, index) => (
+      {state.posts?.map((post, index) => (
         <Post {...post} key={post._id} id={post._id} index={index} />
       ))}
     </div>
   );
-});
+};

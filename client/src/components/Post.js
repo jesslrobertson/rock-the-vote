@@ -6,7 +6,7 @@ import Vote from './Vote'
 
 
 
-export default React.memo(function Post(props){
+export default function Post(props){
   const { title, imgUrl, description, user: postUser, _id: postId, upvotes, downvotes, index} = props
   // const userId = localStorage.getItem("user")
   const { user: loggedInUser } = useContext(UserContext)
@@ -44,4 +44,4 @@ export default React.memo(function Post(props){
     </div>
 
   )
-})
+}

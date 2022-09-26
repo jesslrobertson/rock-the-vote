@@ -70,7 +70,7 @@ postRouter.put("/:postId", (req, res, next) => {
 })
 
 postRouter.put("/upvote/:postId", (req, res, next) => {
-  Post.findOneAndUpdate(
+  Post.findByIdAndUpdate(
     { _id: req.params.postId, user: req.auth._id },
     { $addToSet: { upvotes: req.auth._id }, $pull: { downvotes: req.auth._id }},
     { new: true },
@@ -79,13 +79,14 @@ postRouter.put("/upvote/:postId", (req, res, next) => {
         res.status(500)
         return next(err)
       }
+      console.log(`${updatedPost}`)
       return res.status(201).send(updatedPost)
     }
   )
 })
 
 postRouter.put("/downvote/:postId", (req, res, next) => {
-  Post.findOneAndUpdate(
+  Post.findByIdAndUpdate(
     { _id: req.params.postId, user: req.auth._id },
     { $addToSet: { downvotes: req.auth._id }, $pull: { upvotes: req.auth._id }},
     { new: true },
@@ -94,21 +95,23 @@ postRouter.put("/downvote/:postId", (req, res, next) => {
         res.status(500)
         return next(err)
       }
+      console.log(updatedPost)
       return res.status(201).send(updatedPost)
     }
   )
 })
 
 postRouter.put("/removeVote/:postId", (req, res, next) => {
-  Post.findOneAndUpdate(
+  Post.findByIdAndUpdate(
     {_id: req.params.postId, user: req.auth._id},
-    {$pull: { upvotes: req.auth._id }, $pull: { downvotes:req.auth._id}},
+    {$pull: { upvotes: req.auth._id }, $pull: { downvotes: req.auth._id}},
     {new: true},
     (err, updatedPost) => {
       if(err){
         res.status(500)
         return next(err)
       }
+      console.log(`${updatedPost}`)
       return res.status(201).send(updatedPost)
     }
   )
