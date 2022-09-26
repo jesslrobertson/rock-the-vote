@@ -16,34 +16,51 @@ export default function ContentProvider(props){
   const initState = { 
     user: JSON.parse(localStorage.getItem("user")) || {}, 
     token: localStorage.getItem("token") || "", 
-    userPosts: [],
-    allPosts: [],
+    posts: [{
+      _id: "",
+      title: "",
+      imgUrl: "",
+      description: "",
+      user: "",
+      comments: [],
+      upvotes: [
+      ],
+      downvotes: [
+      ],
+      timestamp: "",
+      __v: 0
+    }],
     message: ""
   }
 
   const [userContent, setUserContent] = useState(initState)
-  const [upvotes, setUpvotes] = useState()
-  const [downvotes, setDownvotes] = useState()
+  // function handleVotes(){
+  //   const [state, dispatch] = React.useReducer(
+  //     reducer, 
+  //     reducerState
+  //   )
+  // }
 
-  function reducer(state, action) {
-    let newState;
-    switch (action.type) {
-      case 'upvote':
-        newState = { votes: state.votes + 1 };
-        break;
-      case 'removeUpvote':
-        newState = { votes: state.votes -1}
-      case 'downvote':
-        newState = { votes: state.votes - 1 };
-        break;
-      case 'removeDownvote':
-      newState = { votes: state.votes + 1 };
-      break;
-      default:
-        throw new Error();
-    }
-    return newState;
-  }
+  // function reducer(state, action) {
+  //   let newState;
+  //   switch (action.type) {
+  //     case 'upvote':
+  //       newState = { upvotes: state.upvotes + 1 };
+  //       break;
+  //     case 'downvote':
+  //       newState = { downvotes: state.downvotes - 1 };
+  //       break;
+  //     case 'comment':
+  //     newState = { };
+  //     break;
+  //     case 'removeComment':
+  //     newState = { };
+  //     break;
+  //     default:
+  //       throw new Error();
+  //   }
+  //   return newState;
+  // }
 
 
   function getUserPosts(){
@@ -51,7 +68,7 @@ export default function ContentProvider(props){
       .then(res => {
         setUserContent(prevState => ({
           ...prevState,
-          userPosts: res.data
+          posts: res.data
         }))
       })
       .catch(err => console.log(err.response.data.errMsg))
@@ -74,7 +91,7 @@ export default function ContentProvider(props){
     .then(res => {
       setUserContent(prevState => ({
         ...prevState,
-        allPosts: res.data
+        posts: res.data
       }))
       //clean this up so we're not overwriting state
     })
@@ -86,8 +103,7 @@ export default function ContentProvider(props){
     .then(res => {
       setUserContent(prevState => ({
         ...prevState,
-        userPosts: prevState.userPosts.filter(post => post._id != postId),
-        allPosts: prevState.allPosts.filter(post => post._id != postId),
+        posts: prevState.posts.filter(post => post._id != postId),
         message: `${res.data}`
       }))
     })
@@ -101,8 +117,12 @@ export default function ContentProvider(props){
     contentAxios.put(`/api/post/upvote/${postId}`)
     .then(res => {
       console.log("Upvote called")
-      setUpvotes(res.data.upvotes.length)
-      setDownvotes(res.data.downvotes.length)
+      setUserContent(prevState => ({
+        ...prevState,
+        posts: prevState.posts.map((post) => {
+          return post._id === res.data._id ? res.data : post
+        })
+      }))
     })
     .catch(err => console.log(err.response.data.errMsg))
   }
@@ -111,8 +131,12 @@ export default function ContentProvider(props){
     contentAxios.put(`/api/post/downvote/${postId}`)
     .then(res => {
       console.log("downvote called")
-      setUpvotes(res.data.upvotes.length)
-      setDownvotes(res.data.downvotes.length)
+      setUserContent(prevState => ({
+        ...prevState,
+        posts: prevState.posts.map((post) => {
+          return post._id === res.data._id ? res.data : post
+        })
+      }))
     })
     .catch(err => console.log(err.response.data.errMsg))
   }
@@ -128,9 +152,7 @@ export default function ContentProvider(props){
         addPost,
         deletePost,
         upvotePost,
-        downvotePost,
-        upvotes,
-        downvotes    
+        downvotePost 
       }}>
         { props.children }
       </ContentContext.Provider>

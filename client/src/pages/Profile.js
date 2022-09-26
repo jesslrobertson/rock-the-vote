@@ -7,7 +7,7 @@ import { UserContext } from "../context/UserProvider"
 
 export default function Profile(){
   const { 
-    userPosts,
+    posts,
     getUserPosts,
     getAllPosts
   } = useContext(ContentContext)
@@ -28,7 +28,7 @@ export default function Profile(){
         <button>New Post</button>
       </Link>
       <h2>Hello, {username}</h2>
-      <PostList posts={userPosts} />
+      <PostList posts={posts} />
 
     </div>
   )
