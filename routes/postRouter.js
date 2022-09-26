@@ -1,6 +1,7 @@
 const express = require("express")
 const postRouter = express.Router()
 const Post = require('../models/post.js')
+const mongoose = require('mongoose')
 
 // Get All posts
 postRouter.get("/", (req, res, next) => {
@@ -101,10 +102,26 @@ postRouter.put("/downvote/:postId", (req, res, next) => {
   )
 })
 
-postRouter.put("/removeVote/:postId", (req, res, next) => {
+postRouter.put("/removeUpvote/:postId", (req, res, next) => {
   Post.findByIdAndUpdate(
-    {_id: req.params.postId, user: req.auth._id},
-    {$pull: { upvotes: req.auth._id }, $pull: { downvotes: req.auth._id}},
+    {_id: req.params.postId},
+    { $pull: {upvotes: mongoose.Types.ObjectId(req.auth._id)}},
+    {new: true},
+    (err, updatedPost) => {
+      if(err){
+        res.status(500)
+        return next(err)
+      }
+      console.log(`${updatedPost}`)
+      return res.status(201).send(updatedPost)
+    }
+  )
+})
+
+postRouter.put("/removeDownvote/:postId", (req, res, next) => {
+  Post.findByIdAndUpdate(
+    {_id: req.params.postId},
+    { $pull:{ downvotes: mongoose.Types.ObjectId(req.auth._id)}},
     {new: true},
     (err, updatedPost) => {
       if(err){

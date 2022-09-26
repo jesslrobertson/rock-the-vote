@@ -38,31 +38,37 @@ export default function ContentProvider(props) {
     initState
   )
 
+
   function contentReducer(state, action) {
+    let newState
+    const prevPosts = [...state.posts ]
     switch (action.type) {
       case 'getPosts':
-        return {
+        newState = {
           ...state,
           posts: action.value
         }
+        break
       case 'appendPosts':
-        return {
+        newState = {
           ...state,
           posts: [...state.posts, action.value]
         }
+        break
       case 'removePost':
-      return {
-        ...state,
-        posts: [...state.posts.filter(post => post._id !== action.value)]
-      }
+        newState = {
+          ...state,
+          posts: action.value
+        }
+        break
       case 'updatePosts':
-        const prevPosts = [...state.posts ]
-        const updatedPostIndex = prevPosts.indexOf(post => post._id === action.value._id)
+        const updatedPostIndex = prevPosts.findIndex(post => post._id === action.value._id)
         prevPosts[updatedPostIndex] = action.value
-        return {
+        newState = {
           ...state,
           posts: prevPosts
-      }
+        }
+        break
       // case 'removeComment':
       //   return {
       //     ...state,
@@ -71,6 +77,7 @@ export default function ContentProvider(props) {
       default:
         throw new Error();
     }
+    return newState
   }
 
   
@@ -107,7 +114,9 @@ export default function ContentProvider(props) {
     contentAxios
       .delete(`/api/post/${postId}`)
       .then((res) => {
-        dispatch({type: 'removePost', value: res.data._id})
+        const freshPosts = state.posts.filter(post => post._id != postId)
+        console.log(freshPosts)
+        dispatch({type: 'removePost', value: freshPosts})
       })
       .catch((err) => console.log(err.response.data.errMsg));
   }
@@ -115,22 +124,8 @@ export default function ContentProvider(props) {
   // //TODO getComments()
   // //TODO postComment()
 
-  function upvotePost(postId, index) {
-    // const thisPost = (state.posts.find(post => post._id === postId))
-    // if (
-    //   thisPost.downvotes?.includes(state.user._id) ||
-    //   thisPost.upvotes?.includes(state.user._id)
-    // ) {
-    //   console.log('calling to remove vote')
-    //   contentAxios
-    //     .put(`/api/post/removeVote/${postId}`)
-    //     .then((res) => {
-    //       console.log(res)
-    //       dispatch({type: 'updatePosts', value: res.data })
-    //       console.log(state.posts)
-    //     })
-    //     .catch((err) => console.log(err.response.data.errMsg));
-    // } else {
+  function upvotePost(postId, voteStatus) {
+    console.log(`upvote called. Vote status is ${voteStatus}`)
       contentAxios
         .put(`/api/post/upvote/${postId}`)
         .then((res) => {
@@ -138,22 +133,10 @@ export default function ContentProvider(props) {
         })
         .catch((err) => console.log(err.response.data.errMsg));
     }
+  
 
-  function downvotePost(postId, index) {
-    // const thisPost = (state.posts.find(post => post._id === postId))
-    // if (
-    //   thisPost.downvotes?.includes(state.user._id) ||
-    //   thisPost.upvotes?.includes(state.user._id)
-    // ) {
-    //   console.log('calling to remove vote')
-    //   contentAxios
-    //     .put(`/api/post/removeVote/${postId}`)
-    //     .then((res) => {
-    //       console.log(res)
-    //       dispatch({type: 'updatePosts', value: res.data })
-    //     })
-    //     .catch((err) => console.log(err.response.data.errMsg));
-    // } else {
+  function downvotePost(postId, voteStatus) {
+    console.log(`downvote called. Vote status is ${voteStatus}`)
       contentAxios
         .put(`/api/post/downvote/${postId}`)
         .then((res) => {
@@ -161,7 +144,24 @@ export default function ContentProvider(props) {
         })
         .catch((err) => console.log(err.response.data.errMsg));
     }
-
+  
+    function removeUpvote(postId, voteStatus) {
+      contentAxios
+      .put(`/api/post/removeUpvote/${postId}`)
+      .then((res) => {
+        dispatch({type: 'updatePosts', value: res.data})
+      })
+      .catch((err) => console.log(err.reponse.data.errMsg))
+    }
+    
+    function removeDownvote(postId, voteStatus) {
+      contentAxios
+        .put(`/api/post/removeDownvote/${postId}`)
+        .then((res) => {
+          dispatch({type: 'updatePosts', value: res.data})
+        })
+        .catch((err) => console.log(err.reponse.data.errMsg))
+    }
 
   return (
     <ContentContext.Provider
@@ -175,6 +175,8 @@ export default function ContentProvider(props) {
         deletePost,
         upvotePost,
         downvotePost,
+        removeUpvote,
+        removeDownvote
       }}
     >
       {props.children}
