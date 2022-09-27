@@ -4,13 +4,14 @@ import { ContentContext } from "../context/ContentProvider";
 
 export default function PostList(props) {
   const { state } = useContext(ContentContext);
+  //subtract downvotes from upvotes, and sort based on that number
   // const relativeVotes = 
 
   function compareNumbers(a, b) {
     return a - b;
   }
 
-  const sortedPosts = state.posts.upvotes
+  // const sortedPosts = state.posts.comparativeVote.sort(compareNumbers)
 
 
   return (
