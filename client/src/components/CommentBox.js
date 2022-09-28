@@ -4,12 +4,11 @@ import { ContentContext } from '../context/ContentProvider'
 
 export default function CommentBox(){
   const { singlePost } = useContext(ContentContext)
-  console.log(singlePost.comments)
 
   return (
-    <div>
-      <h1>I'm a comment section! A list of comments will be mapped over to populate here.</h1>
-      <Comment />
+    <div className="comment-container">
+      <h3>Comments</h3>
+      {singlePost.comments && singlePost.comments.map(comment => <Comment {...comment} key={comment._id}/>)}
     </div>
   )
 }

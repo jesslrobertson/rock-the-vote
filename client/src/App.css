@@ -57,7 +57,7 @@ textarea::placeholder {
   color: var(--gray);
 }
 
-.link {
+.link{
   text-decoration: none;
   font-weight: bold;
   font-family: Arial, Helvetica, sans-serif;
@@ -73,6 +73,9 @@ h5 {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+h5 {
+  color: black;
+}
 form {
   display: flex;
   flex-direction: column;
@@ -161,6 +164,15 @@ form {
 .vote-count {
   font-weight: bold;
   padding: 0.5rem 0rem;
+}
+
+.vote-box-comments {
+  display: flex;
+  text-decoration: none;
+}
+
+.link-element {
+  text-decoration: none;
 }
 
 .yea {
@@ -258,4 +270,16 @@ label {
   transform: translateY(10px);
   opacity: 1;
   visibility: visible;
+}
+
+.comment-container {
+  width: 80vw;
+  max-width: 800px;
+}
+
+.single-comment-box {
+  background-color:rgb(191, 208, 248);
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
 }

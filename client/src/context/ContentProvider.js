@@ -70,21 +70,9 @@ export default function ContentProvider(props) {
           posts: prevPosts,
         };
         break
-      case "sortPosts":
-        newState = {
-          ...state,
-          posts: [...prevPosts, prevPosts.comparativeVote = action.value]
-        }
-        break;
-      // case 'removeComment':
-      //   return {
-      //     ...state,
-      //     currentPost: action.value
-      //   }
       default:
         throw new Error();
     }
-    console.log(newState.posts)
     return newState;
   }
 
@@ -179,6 +167,17 @@ export default function ContentProvider(props) {
       .catch((err) => console.log(err.response.data.errMsg))
   }
 
+  function deleteComment(commentId, postId){
+    contentAxios
+      .delete( `/api/comment/${postId}/${commentId}`)
+      .then((res)=>{
+        console.log(res)
+      })
+      .catch((err) => {
+        console.log(err.response.data.errMsg)
+      })
+  }
+
 
   return (
     <ContentContext.Provider
@@ -196,7 +195,8 @@ export default function ContentProvider(props) {
         removeDownvote,
         addComment,
         singlePost,
-        setSinglePost
+        setSinglePost,
+        deleteComment
       }}
     >
       {props.children}

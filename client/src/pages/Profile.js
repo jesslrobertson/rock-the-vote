@@ -26,7 +26,7 @@ export default function Profile(){
       <Link to='/new-post'>
         <button>New Post</button>
       </Link>
-      <h2>Hello, {username}</h2>
+      <h2>Hello, {username}. Here are your posts: </h2>
       <PostList posts={state.posts} />
 
     </div>

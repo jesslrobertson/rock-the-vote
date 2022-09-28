@@ -28,10 +28,6 @@ export default function PostList(props) {
 
   return (
     <div>
-      <h2>
-        I'm a list of posts. An array of posts will be mapped over to render
-        here.
-      </h2>
       {state.posts?.map((post, index) => (
         <Post {...post} key={post._id} id={post._id} index={index} />
       ))}
