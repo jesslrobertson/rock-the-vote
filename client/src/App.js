@@ -4,6 +4,7 @@ import Nav from './components/Nav'
 import Auth from './components/Auth'
 import Profile from './pages/Profile'
 import Home from './pages/Home'
+import SinglePost from './pages/SinglePost'
 import ProtectedRoute from './components/ProtectedRoute'
 import "./App.css"
 import PostForm from "./pages/PostForm"
@@ -13,6 +14,8 @@ import {ContentContext} from './context/ContentProvider'
 export default function App(){
   const { token, logout } = useContext(UserContext)
   const { getAllPosts, getUserPosts} = useContext(ContentContext)
+
+
 
 
   return (
@@ -44,6 +47,14 @@ export default function App(){
           element={
             <ProtectedRoute token={token} redirectTo={"/"}>
               <PostForm />
+            </ProtectedRoute>
+          }
+          />
+        <Route
+          path="/single-post"
+          element={
+            <ProtectedRoute token={token} redirectTo={"/"} path={'/single-post'}>
+              <SinglePost />
             </ProtectedRoute>
           }
           />

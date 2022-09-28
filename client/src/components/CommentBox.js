@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Comment from './Comment'
+import { ContentContext } from '../context/ContentProvider'
 
 export default function CommentBox(){
+  const { singlePost } = useContext(ContentContext)
+  console.log(singlePost.comments)
 
   return (
     <div>

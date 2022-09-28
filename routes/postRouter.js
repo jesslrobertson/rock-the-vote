@@ -3,6 +3,20 @@ const postRouter = express.Router()
 const Post = require('../models/post.js')
 const mongoose = require('mongoose')
 
+const PostControls = require("../controllers/PostController")
+
+function compareNums (a, b){
+  const totalA = a.upvotes.length - a.downvotes.length
+  const totalB = b.upvotes.length - b.downvotes.length
+  if (totalA > totalB) {
+    return -1
+  } else if (totalA === totalB) {
+    return 0
+  } else {
+    return 1
+  }
+}
+
 // Get All posts
 postRouter.get("/", (req, res, next) => {
   Post.find((err, posts) => {
@@ -10,7 +24,8 @@ postRouter.get("/", (req, res, next) => {
       res.status(500)
       return next(err)
     }
-    return res.status(200).send(posts)
+    const sortedPosts = posts.sort(compareNums)
+    return res.status(200).send(sortedPosts)
   })
 })
 

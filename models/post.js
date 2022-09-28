@@ -31,6 +31,18 @@ const postSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User"
   }],
+  totalVotes: {
+    type: Number,
+    default: () => {
+      if (this.upvotes && this.downvotes) {
+        this.upvotes.length - this.downvotes.length
+      } else if (this.upvotes){
+        return this.upvotes.length
+      } else {
+        return 0
+      }
+    },
+  },
   timestamp: {
     type: Date,
     default: Date.now
