@@ -19,7 +19,11 @@ const userSchema = new Schema({
   isAdmin: {
     type: Boolean,
     default: false
-  }
+  },
+  posts: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post'
+  }],
 })
 
 //password encryption

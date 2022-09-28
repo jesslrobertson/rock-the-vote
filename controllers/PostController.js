@@ -1,22 +1,20 @@
 const mongoose = require("mongoose")
 const PostModel = require("../models/post")
 
-const PostController = {
-  find: async (req, res) => {
-    let found = await PostModel.find()
-    res.json(found)
-  },
-  all: async (req, res) => {
-    let allPosts = await PostModel.find()
-    res.json(allPosts)
-  },
-  // create: async(req, res) => {
 
-  // }
-  getAllComments: async (req, res) => {
-    let foundPost = await PostModel.find({_id: req.params.postId}).populate("comments")
-    res.json(foundPost)
+function popComments(){
+    return PostModel.find((req, res).populate({
+      path: 'comments',
+      populate: {
+        path: "author",
+        model: "User"
+      }
+    }).exec((err, posts) => {
+      return posts
+    }))
   }
-}
 
-module.exports = PostController
+
+
+module.exports = popComments
+

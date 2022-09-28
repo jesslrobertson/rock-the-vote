@@ -4,13 +4,12 @@ import { ContentContext } from "../context/ContentProvider"
 import { Link } from 'react-router-dom'
 
 export default function Vote(props){
-  const { upvotePost, downvotePost, removeUpvote, removeDownvote, dispatch, state, singlePost, setSinglePost} = useContext(ContentContext)
+  const { upvotePost, downvotePost, removeUpvote, removeDownvote, state, singlePost, setSinglePost} = useContext(ContentContext)
   const { postId, index, voteStatus, comments} = props 
 
   function handleSinglePost(postId){
     let currentPost = state.posts.find(post => post._id === postId)
     setSinglePost(currentPost)
-    console.log(singlePost)
   }
 
   const location = useLocation()
@@ -76,11 +75,13 @@ export default function Vote(props){
           : ()=>downvotePost(postId, voteStatus)
         }
         >{state.posts[index]?.downvotes?.length} Nay</button>
-        <h5>{comments.length} Comments</h5>
-        <Link to='/single-post'>
-          <button
-            onClick={()=>handleSinglePost(postId)}
-          >Add Comment</button>
+        <Link to='/single-post' className='link-element' >
+          <div className="vote-box-comments" onClick={()=>handleSinglePost(postId)}>
+            <h5>{comments.length} Comments</h5>
+            <button
+              onClick={()=>handleSinglePost(postId)}
+            >Add Comment</button>
+          </div>
         </Link>
     </div>
   )

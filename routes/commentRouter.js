@@ -1,59 +1,69 @@
-const express = require("express")
-const commentRouter = express.Router()
-const Comment = require('../models/comment.js')
-const Post = require('../models/post')
-const mongoose = require('mongoose')
+const express = require("express");
+const commentRouter = express.Router();
+// const Comment = require('../models/comment.js')
+const Post = require("../models/post");
+const mongoose = require("mongoose");
 
 
+Post.find()
+  .populate({
+    path: 'comments',
+    populate: {
+      path: 'author',
+      model: 'User'
+    }
+  })
 
-// Add new comment
 commentRouter.post("/:postId", (req, res, next) => {
-  // let id= req.params.postId.substring(1)
-  // { postId: mongoose.Types.ObjectId(id) }
-  // req.body.user = req.auth._id
-  req.body.user = mongoose.Types.ObjectId(req.auth._id)
-  req.body.post = mongoose.Types.ObjectId(req.params.postId)
-  const newComment = new Comment(req.body)
+  const newComment = req.body;
   Post.findByIdAndUpdate(
-    {_id: mongoose.Types.ObjectId(req.params.postId)},
-    {$addToSet: {comments: newComment._id }}
-    
-  )
-  newComment.save((err, savedComment) => {
-    if(err){
+    { _id: req.params.postId, user: req.auth._id },
+    { $addToSet: { comments:{ comment: newComment.comment, author: mongoose.Types.ObjectId(req.auth._id)}} },
+    { new: true },
+    (err, updatedPost) => {
+      if (err) {
+        res.status(500);
+        return next(err);
+      } // return res.status(201).send({ updatedPost });
+      console.log(updatedPost)
+    }
+  );
+  Post.find({_id: req.params.postId}).populate({
+    path: "comments",
+      populate: {
+        path: "author",
+        select: "username"
+      }
+  }).exec((err, populatedPost) => {
+    if (err){
       res.status(500)
       return next(err)
     }
-    return res.status(201).send(savedComment)
+    return res.status(201).send({populatedPost})
   })
-})
+});
 
-//Get comments by post
-commentRouter.get("/:postId", (req, res, next) => {
-  Comment.find(
-    {postId: req.params.postId}, 
-    (err, comments) => {
-    if(err){
-      res.status(500)
-      return next(err)
-    }
-    return res.status(200).send(comments)
-  })
-})
 
 // Delete comment
-commentRouter.delete("/:commentId", (req, res, next) => {
-  Comment.findOneAndDelete(
-    { _id: req.params.commentId, user: req.auth._id },
-    (err, deletedcomment) => {
-      if(err){
-        res.status(500)
-        return next(err)
+commentRouter.delete("/:postId/:commentId", (req, res, next) => {
+  Post.findOneByIdAndUpdate(
+    {
+      _id: req.params.postId,
+      user: req.auth._id,
+      comment: req.params.commentId,
+    },
+    { $pull: { comments: req.params.commentId } },
+    (err, deletedComment) => {
+      if (err) {
+        res.status(500);
+        return next(err);
       }
-      return res.status(200).send(`Successfully deleted comment: ${deletedcomment.title}`)
+      return res
+        .status(200)
+        .send(`Successfully deleted comment: ${deletedComment.Comment}`);
     }
-  )
-})
+  );
+});
 
 // Update comment
 commentRouter.put("/:commentId", (req, res, next) => {
@@ -62,14 +72,13 @@ commentRouter.put("/:commentId", (req, res, next) => {
     req.body,
     { new: true },
     (err, updatedComment) => {
-      if(err){
-        res.status(500)
-        return next(err)
+      if (err) {
+        res.status(500);
+        return next(err);
       }
-      return res.status(201).send(updatedComment)
+      return res.status(201).send(updatedComment);
     }
-  )
-})
+  );
+});
 
-
-module.exports = commentRouter
+module.exports = commentRouter;
