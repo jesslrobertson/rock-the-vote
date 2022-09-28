@@ -7,7 +7,7 @@ import Vote from './Vote'
 
 
 export default function Post(props){
-  const { title, imgUrl, description, user: postUser, _id: postId, upvotes, downvotes, index} = props
+  const { title, imgUrl, description, user: postUser, _id: postId, upvotes, downvotes, index, comments } = props
   // const userId = localStorage.getItem("user")
   const { user: loggedInUser } = useContext(UserContext)
   const { deletePost } = useContext(ContentContext)
@@ -52,7 +52,7 @@ export default function Post(props){
       userPost
       : otherPost
       }
-      <Vote postId={postId} key={postId} upvotes={upvotes} downvotes={downvotes} index={index} voteStatus={voteStatus} setVoteStatus={setVoteStatus}/>
+      <Vote postId={postId} key={postId} upvotes={upvotes} downvotes={downvotes} index={index} voteStatus={voteStatus} setVoteStatus={setVoteStatus} comments={comments}/>
     </div>
 
   )

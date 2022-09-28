@@ -1,18 +1,30 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Post from "./Post";
 import { ContentContext } from "../context/ContentProvider";
 
 export default function PostList(props) {
   const { state } = useContext(ContentContext);
-  //subtract downvotes from upvotes, and sort based on that number
-  // const relativeVotes = 
 
   function compareNumbers(a, b) {
-    return a - b;
+    const totalA = a.upvotes.length - a.downvotes.length
+    const totalB = b.upvotes.length - b.downvotes.length
+    console.log('totalA')
+    console.log(totalA)
+    console.log('totalB')
+    console.log(totalB)
+    if (totalA < totalB) {
+      return -1
+    } else if (totalA === totalB) {
+      return 0
+    } else {
+      return 1
+    }
   }
 
-  // const sortedPosts = state.posts.comparativeVote.sort(compareNumbers)
-
+  // const [sortedPosts, setSortedPosts] = useState(state.posts)
+  // useEffect(() => {
+  //   setSortedPosts([...state.posts]?.sort(compareNumbers))
+  // }, [])
 
   return (
     <div>

@@ -1,19 +1,24 @@
 const express = require("express")
 const commentRouter = express.Router()
 const Comment = require('../models/comment.js')
+const Post = require('../models/post')
 const mongoose = require('mongoose')
 
 
 
 // Add new comment
 commentRouter.post("/:postId", (req, res, next) => {
-  let id= req.params.postId.substring(1)
-  { postId = mongoose.Types.ObjectId(id) }
-  req.body.user = req.auth._id
+  // let id= req.params.postId.substring(1)
+  // { postId: mongoose.Types.ObjectId(id) }
+  // req.body.user = req.auth._id
+  req.body.user = mongoose.Types.ObjectId(req.auth._id)
+  req.body.post = mongoose.Types.ObjectId(req.params.postId)
   const newComment = new Comment(req.body)
-  newComment.votes = 1;
-  newComment.voters.push(req.auth._id)
-  newComment.post = postId
+  Post.findByIdAndUpdate(
+    {_id: mongoose.Types.ObjectId(req.params.postId)},
+    {$addToSet: {comments: newComment._id }}
+    
+  )
   newComment.save((err, savedComment) => {
     if(err){
       res.status(500)

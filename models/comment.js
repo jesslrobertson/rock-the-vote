@@ -17,13 +17,6 @@ const commentSchema = new Schema({
     ref: "Post",
     required: true
   },
-  votes: {
-    type: Number,
-    required: true
-  },
-  voters: {
-    type: Array
-  },
   timestamp: {
     type: Date,
     default: Date.now
