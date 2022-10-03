@@ -58,6 +58,14 @@ export default function App(){
             </ProtectedRoute>
           }
           />
+        <Route
+          path="/edit-post"
+          element={
+            <ProtectedRoute token={token} redirectTo={"/"} path={'/edit-post'}>
+              <PostForm />
+            </ProtectedRoute>
+          }
+          />
       </Routes>
     </div>
   )

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../context/UserProvider'
 import { ContentContext } from '../context/ContentProvider'
 import CommentBox from './CommentBox'
@@ -10,8 +11,9 @@ export default function Post(props){
   const { title, imgUrl, description, user: postUser, _id: postId, upvotes, downvotes, index, comments } = props
   // const userId = localStorage.getItem("user")
   const { user: loggedInUser } = useContext(UserContext)
-  const { deletePost } = useContext(ContentContext)
+  const { deletePost, state, dispatch, setSinglePost, singlePost } = useContext(ContentContext)
   const [voteStatus, setVoteStatus] = useState("neutral")
+  const navigate = useNavigate() 
   
   useEffect(()=>{
     if (upvotes?.includes(loggedInUser._id)){
@@ -23,6 +25,13 @@ export default function Post(props){
     }
   }, [upvotes, downvotes])
 
+  function handleEdit(postId){
+    let currentPost = state.posts.find(post => post._id === postId)
+    setSinglePost(currentPost)
+    dispatch({ type: 'edit'})
+    navigate('/edit-post')
+  }
+
 
   const userPost = (
     <> 
@@ -31,7 +40,7 @@ export default function Post(props){
       {imgUrl && <img src={imgUrl} alt="user image" className="post-img" />}
       <p>{description}</p>
       <div className="edit-delete-box">
-        <button>Edit</button>
+        <button onClick={() => handleEdit(postId)}>Edit</button>
         <button onClick={() => deletePost(postId)}>Delete</button>
       </div>
     </>
