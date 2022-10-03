@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ContentContext } from '../context/ContentProvider'
 
 const initInputs = {
@@ -8,8 +9,20 @@ const initInputs = {
 }
 
 export default function PostForm(props){
-  const { addPost } = useContext(ContentContext)
+  const { addPost, editPost, dispatch, state, singlePost } = useContext(ContentContext)
   const [inputs, setInputs] = useState(initInputs)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (state.edit === true){
+      setInputs({
+        title: singlePost.title,
+        description: singlePost.description,
+        imgUrl: singlePost.imgUrl 
+      })
+    }
+  }, [])
+
 
   function handleChange(e){
     const {name, value} = e.target
@@ -21,8 +34,14 @@ export default function PostForm(props){
 
   function handleSubmit(e){
     e.preventDefault()
-    addPost(inputs)
+    if (state.edit === false){
+      addPost(inputs)
+    } else {
+      editPost(singlePost._id, inputs)
+      dispatch({ type: 'edit'})
+    }
     setInputs(initInputs)
+    navigate(-1)
   }
 
   const { title, description, imgUrl } = inputs
@@ -49,7 +68,7 @@ export default function PostForm(props){
           value={imgUrl} 
           onChange={handleChange} 
           placeholder="Image Url"/>
-        <button>Add Post</button>
+        <button>Submit</button>
       </form>
     </div>
   )

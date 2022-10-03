@@ -30,7 +30,8 @@ export default function ContentProvider(props) {
         __v: 0
       },
     ],
-    message: ""
+    message: "",
+    edit: false
   };
 
   const [state, dispatch] = useReducer(contentReducer, initState);
@@ -70,6 +71,12 @@ export default function ContentProvider(props) {
           posts: prevPosts,
         };
         break
+      case "edit":
+        newState = {
+          ...state,
+          edit: true
+        }
+        break;
       default:
         throw new Error();
     }
@@ -120,6 +127,15 @@ export default function ContentProvider(props) {
 
   // //TODO getComments()
   // //TODO postComment()
+
+  function editPost(postId, editedPost) {
+    contentAxios
+      .put(`/api/post/${postId}`, editedPost)
+      .then((res) => {
+        dispatch({ type: "updatePosts", value: res.data });
+      })
+      .catch((err) => console.log(err.response.data.errMsg));
+  }
 
   function upvotePost(postId, voteStatus) {
     contentAxios
@@ -196,7 +212,8 @@ export default function ContentProvider(props) {
         addComment,
         singlePost,
         setSinglePost,
-        deleteComment
+        deleteComment, 
+        editPost
       }}
     >
       {props.children}
